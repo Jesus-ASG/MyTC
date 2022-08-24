@@ -8,13 +8,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.listen()
     conn, addr = s.accept()
 
-    file = open('share/txt.txt', 'wb')
+    resp = conn.recv(1024)
+    if resp:
+        print(resp.decode('utf-8'))
+
+    # file = open('share', 'wb')
     
-    l = conn.recv(1024)
-    while(l):
-        file.write(l)
-        l = conn.recv(1024)
+    # l = conn.recv(1024)
+    # while(l):
+    #     file.write(l)
+    #     l = conn.recv(1024)
         
-    file.close()
+    # file.close()
     
     s.close()
