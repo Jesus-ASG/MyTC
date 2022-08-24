@@ -42,10 +42,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 # manda el nombre del archivo
                 s.send(i.encode('UTF-8'))
                 print(f'{i} enviado')
-                #file = open(i, 'rb')
+                file = open(i, 'rb')
                 # manda el archivo
-                #s.sendfile(file)
-                #file.close()
+                s.sendfile(file)
+                file.close()
+
+                while True:
+                    endp = s.recv(1024).decode('UTF-8')
+                    if endp == 'end':
+                        break
+                s.send('continua'.encode('UTF-8'))
+
         
             break
     

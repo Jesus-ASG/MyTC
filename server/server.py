@@ -15,31 +15,37 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     f_num = int(conn.recv(1024).decode('UTF-8'))
     conn.send('ok'.encode('UTF-8')) # confirmación de total de archivos
-    
+
+
     for i in range(f_num):
         path = conn.recv(1024).decode('UTF-8') # recibe path
-        print(f'{path}')
+        print(f'recibido path {path}')
 
-    """
-    path = conn.recv(1024).decode('UTF-8') # recibe path
-    print(f'recibido {path}')
+        # obtiene el nombre del path
+        filename = path.split('/')[-1]
 
-    # obtiene el nombre del path
-    filename = path.split('/')[-1]
+        # obtiene el path separado
+        path = path[:len(path)-len(filename)]
 
-    # obtiene el path separado
-    path = path[:len(path)-len(filename)]
+        # verifica si la ruta del path existe, si no la crea
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-    # verifica si la ruta del path existe, si no la crea
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    # crea el documento
-    file = open(path+filename, 'wb')
-    l = conn.recv(1024)
-    while(l):
-        file.write(l)
+        # crea el documento
+        file = open(path+filename, 'wb')
         l = conn.recv(1024)
-        
-    file.close()
-    """
+        while(l):
+            file.write(l)
+            l = conn.recv(1024)
+        file.close()
+        print('termina de escribir')
+
+        s.send('end'.encode('UTF-8'))
+        print(f' y avisa')
+        print(f'esperando a que reciba la orden de continuar')
+        while True:
+            continuar = conn.recv(1024).decode('UTF-8')
+            if continuar == 'continua':
+                break
+
+    
