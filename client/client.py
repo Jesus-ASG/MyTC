@@ -50,11 +50,10 @@ for i in files:
         s.connect((host, port))
         
         # manda el nombre del archivo
-        s.send(i.encode('utf-8'))
+        s.send(i.encode('UTF-8'))
 
         # file = open(i, 'rb')
         # s.sendfile(file)
-        s.close()
 
 
 """
