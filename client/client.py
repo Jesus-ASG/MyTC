@@ -1,4 +1,4 @@
-from genericpath import isdir
+
 import socket
 import os
 import sys
@@ -6,8 +6,10 @@ import pathlib
 
 host = '192.168.100.151'  # ip del servidor
 port = 8000  # Puerto de envío
+key = '/090008765'
 
 system = 'LINUX'
+os.system('cls' if os.name == 'nt' else 'clear')
 
 l = list()
 def listarTodo(path):
@@ -41,19 +43,24 @@ def writeSafely(path):
 
 
 files = listarTodo('share')
-inp = input("Presiona 1 para salir: ")
-if inp == "1":
-    sys.exit()
+# inp = input("Presiona 1 para salir: ")
+# if inp == "1":
+#     sys.exit()
 
-for i in files:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((host, port))
+i = 'share/file.mp4'
+#for i in files:
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.connect((host, port))
+    
+    file = open(i, 'rb')
+    # manda el nombre del archivo
+    i += key
+    s.send(i.encode('UTF-8'))
+
+        # manda el archivo
         
-        # manda el nombre del archivo
-        s.send(i.encode('UTF-8'))
-
-        # file = open(i, 'rb')
-        # s.sendfile(file)
+    s.sendfile(file)
+        
 
 
 """
