@@ -6,6 +6,21 @@ port = 8000
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
+files_number = 0
+
+# Escuchando primera vez para contar archivos
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     s.bind((host, port))
+#     s.listen()
+#     conn, addr = s.accept()
+
+#     aux = conn.recv(1024).decode('UTF-8')
+#     files_number = int(aux)
+
+# print(f'total files: {files_number}')
+
+
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
     s.listen() # escuchando

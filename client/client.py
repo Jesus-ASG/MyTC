@@ -46,6 +46,11 @@ files = listarTodo('share')
 # if inp == "1":
 #     sys.exit()
 
+# with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+#     s.connect((host, port))
+#     s.send(str(len(files)).encode('UTF-8'))
+    
+
 i = 'share/file.mp4'
 #for i in files:
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -58,25 +63,3 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # manda el archivo
     s.sendfile(file)
         
-
-
-"""
-while True:
-    inp = input("Presiona 1 para salir: ")
-    if inp == "1":
-        break
-    
-    
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((host, port))
-
-        print('Enviando archivo')
-        file = open('share', 'rb')
-        # l = file.read(1024)
-        # while l:
-        #     s.send(l)
-        #     l = file.read(1024)
-        s.sendfile(file)
-        s.close()
-"""
-
