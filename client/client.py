@@ -6,7 +6,6 @@ import pathlib
 
 host = '192.168.100.151'  # ip del servidor
 port = 8000  # Puerto de envío
-key = '/090008765'
 
 system = 'LINUX'
 os.system('cls' if os.name == 'nt' else 'clear')
@@ -54,11 +53,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     
     file = open(i, 'rb')
     # manda el nombre del archivo
-    i += key
     s.send(i.encode('UTF-8'))
 
-        # manda el archivo
-        
+    # manda el archivo
     s.sendfile(file)
         
 
