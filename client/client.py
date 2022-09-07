@@ -3,10 +3,15 @@ import socket
 import os
 import sys
 import pathlib
+from tkinter.ttk import Separator
 
 host1 = '192.168.100.151'  # ip del servidor
 host = 'localhost'
 port = 8000  # Puerto de envío
+
+FORMAT = 'UTF-8'
+message_separate = '<separate>'
+message_eof = '<endoffile>'
 
 system = 'LINUX'
 os.system('cls' if os.name == 'nt' else 'clear')
@@ -24,36 +29,25 @@ def listarTodo(path):
     return l
 
 
+#files = listarTodo('share/')
+fs = 'share/file.mp4'
 
-files = listarTodo('share')
-# inp = input("Presiona 1 para salir: ")
-# if inp == "1":
-#     sys.exit()
-    
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((host, port))
 
-    s.send(str(len(files)).encode('UTF-8'))
-    msgc = s.recv(1024).decode('UTF-8')
-    
-    while True:
-        if msgc == 'ok':
-            for i in files:
-                # manda el nombre del archivo
-                s.send(i.encode('UTF-8'))
-                print(f'{i} enviado')
-                file = open(i, 'rb')
-                # manda el archivo
-                s.sendfile(file)
-                file.close()
+    file_data = fs +message_separate
 
-                while True:
-                    endp = s.recv(1024).decode('UTF-8')
-                    if endp == 'end':
-                        break
-                s.send('continua'.encode('UTF-8'))
+    s.send(file_data.encode(FORMAT))
+    print('name sended')
 
-        
-            break
+    with open(fs, 'rb') as f:
+        data = f.read()
+        s.send(data)
+    print('file sended')
+    s.send(message_eof.encode(FORMAT))
+    print('confirmation sended')
+
+
+
     
     

@@ -5,47 +5,56 @@ host1 = '192.168.100.151'
 host = 'localhost'
 port = 8000
 
+FORMAT = 'UTF-8'
+message_separate = '<separate>'
+message_eof = '<endoffile>'
+
+
 os.system('cls' if os.name == 'nt' else 'clear')
 
-
+current_file = ''
+data = ''
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
     s.listen() # escuchando
     conn, addr = s.accept() 
 
-    f_num = int(conn.recv(1024).decode('UTF-8'))
-    conn.send('ok'.encode('UTF-8')) # confirmación de total de archivos
+    while True:
+        #verify = conn.recv(1024)
 
+        
+        data += conn.recv(1024).decode(FORMAT)
+        if message_separate in data:
+            print('leyó el nombre del archivo')
+            path = data.split(message_separate)[0]
+            data = data.split(message_separate)[1]
+            current_file = path
+            
+            # obtiene el nombre del path
+            filename = path.split('/')[-1]
 
-    for i in range(f_num):
-        path = conn.recv(1024).decode('UTF-8') # recibe path
-        print(f'recibido path {path}')
+            # obtiene el path separado
+            path = path[:len(path)-len(filename)]
 
-        # obtiene el nombre del path
-        filename = path.split('/')[-1]
+            # verifica si la ruta del path existe, si no la crea
+            if not os.path.exists(path):
+                os.makedirs(path)
+        
+        print('itera')
+        
+        if message_eof in data:
+            print('leyó final de archivo, cf ', current_file)
+            data = data.split(message_eof)[0]
+            # crea el documento
+            
+            file = open(current_file, 'wb')
+            data = data.encode(FORMAT)
+            #while data:
+            file.write(data)
+            file.close()
 
-        # obtiene el path separado
-        path = path[:len(path)-len(filename)]
+            break
 
-        # verifica si la ruta del path existe, si no la crea
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        # crea el documento
-        file = open(path+filename, 'wb')
-        l = conn.recv(1024)
-        while(l):
-            file.write(l)
-            l = conn.recv(1024)
-        file.close()
-        print('termina de escribir')
-
-        s.send('end'.encode('UTF-8'))
-        print(f' y avisa')
-        print(f'esperando a que reciba la orden de continuar')
-        while True:
-            continuar = conn.recv(1024).decode('UTF-8')
-            if continuar == 'continua':
-                break
+    
 
     
