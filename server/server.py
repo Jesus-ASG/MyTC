@@ -7,16 +7,17 @@ sys.path.append('..')
 
 from structure import Structure
 
-
 host1 = '192.168.100.151'
 host = 'localhost'
 port = 8000
 
 FORMAT = 'UTF-8'
-message_separate = '<separate>'
-message_eof = '<endoffile>'
+BUFFER_SIZE = 1048576
+message_separate = b'<separate>'
+message_eof = b'<endoffile>'
 pkg_size = 1024
 fill_key = '|xfzd'
+
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -25,8 +26,8 @@ data_aux = ''
 data_b = ''
 endoffile = False
 
-
 it = 0
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
     s.listen()
@@ -35,7 +36,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     data = b''
     while True:
-        packet = conn.recv(4096)
+        packet = conn.recv(BUFFER_SIZE)
         if not packet: break
         data += packet
 
