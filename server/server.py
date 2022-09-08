@@ -1,32 +1,17 @@
-import os
-import pickle
 import socket
+import pickle
+import os
 import sys
-
+import time
 sys.path.append('..')
-
 from structure import Structure
 
-host1 = '192.168.100.151'
 host = 'localhost'
 port = 8000
 
-FORMAT = 'UTF-8'
 BUFFER_SIZE = 1048576
-message_separate = b'<separate>'
-message_eof = b'<endoffile>'
-pkg_size = 1024
-fill_key = '|xfzd'
-
 
 os.system('cls' if os.name == 'nt' else 'clear')
-
-current_file = ''
-data_aux = ''
-data_b = ''
-endoffile = False
-
-it = 0
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
@@ -40,19 +25,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         if not packet: break
         data += packet
 
-    d = pickle.loads(data)
+    list_files = pickle.loads(data)
 
-    # obtiene el nombre del path
-    filename = d.fpath.split('/')[-1]
+    for f_obj in list_files:
+        # obtiene el nombre del path
+        filename = f_obj.fpath.split('/')[-1]
 
-    # obtiene el path separado
-    d.fpath = d.fpath[:len(d.fpath) - len(filename)]
+        # obtiene el path separado
+        f_obj.fpath = f_obj.fpath[:len(f_obj.fpath) - len(filename)]
 
-    # verifica si la ruta del path existe, si no la crea
-    if not os.path.exists(d.fpath):
-        os.makedirs(d.fpath)
+        # verifica si la ruta del path existe, si no la crea
+        if not os.path.exists(f_obj.fpath):
+            os.makedirs(f_obj.fpath)
 
-    file = open(d.fpath+filename, 'wb')
-    file.write(d.fdata)
-    file.close()
-    print(f'Server: {d.fpath} saved')
+        file = open(f_obj.fpath + filename, 'wb')
+        file.write(f_obj.fdata)
+        file.close()
+        print(f'Server: {f_obj.fpath+filename} saved')
