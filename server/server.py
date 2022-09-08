@@ -1,5 +1,12 @@
-import socket
 import os
+import pickle
+import socket
+import sys
+
+sys.path.append('..')
+
+from structure import Structure
+
 
 host1 = '192.168.100.151'
 host = 'localhost'
@@ -8,53 +15,43 @@ port = 8000
 FORMAT = 'UTF-8'
 message_separate = '<separate>'
 message_eof = '<endoffile>'
-
+pkg_size = 1024
+fill_key = '|xfzd'
 
 os.system('cls' if os.name == 'nt' else 'clear')
 
 current_file = ''
-data = ''
+data_aux = ''
+data_b = ''
+endoffile = False
+
+
+it = 0
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
-    s.listen() # escuchando
-    conn, addr = s.accept() 
+    s.listen()
+    print('Server listen...')
+    conn, addr = s.accept()
 
+    data = b''
     while True:
-        #verify = conn.recv(1024)
+        packet = conn.recv(4096)
+        if not packet: break
+        data += packet
 
-        
-        data += conn.recv(1024).decode(FORMAT)
-        if message_separate in data:
-            print('leyó el nombre del archivo')
-            path = data.split(message_separate)[0]
-            data = data.split(message_separate)[1]
-            current_file = path
-            
-            # obtiene el nombre del path
-            filename = path.split('/')[-1]
+    d = pickle.loads(data)
 
-            # obtiene el path separado
-            path = path[:len(path)-len(filename)]
+    # obtiene el nombre del path
+    filename = d.fpath.split('/')[-1]
 
-            # verifica si la ruta del path existe, si no la crea
-            if not os.path.exists(path):
-                os.makedirs(path)
-        
-        print('itera')
-        
-        if message_eof in data:
-            print('leyó final de archivo, cf ', current_file)
-            data = data.split(message_eof)[0]
-            # crea el documento
-            
-            file = open(current_file, 'wb')
-            data = data.encode(FORMAT)
-            #while data:
-            file.write(data)
-            file.close()
+    # obtiene el path separado
+    d.fpath = d.fpath[:len(d.fpath) - len(filename)]
 
-            break
+    # verifica si la ruta del path existe, si no la crea
+    if not os.path.exists(d.fpath):
+        os.makedirs(d.fpath)
 
-    
-
-    
+    file = open(d.fpath+filename, 'wb')
+    file.write(d.fdata)
+    file.close()
+    print(f'Server: {d.fpath} saved')
