@@ -6,12 +6,22 @@ import time
 sys.path.append('..')
 from structure import Structure
 
-host = 'localhost'
+host1 = 'localhost'
+host = '192.168.100.151'
 port = 8000
 
 BUFFER_SIZE = 1048576
 
-os.system('cls' if os.name == 'nt' else 'clear')
+sep_system = ''
+sep_new = '<<<separator>>>'
+SO = 'WINDOWS' if os.name == 'nt' else 'LINUX'
+if SO == 'WINDOWS':
+    os.system('cls')
+    sep_system = '\\'
+else:
+    os.system('clear')
+    sep_system = '/'
+
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((host, port))
@@ -29,7 +39,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     for f_obj in list_files:
         # obtiene el nombre del path
-        filename = f_obj.fpath.split('/')[-1]
+        f_obj.fpath = f_obj.fpath.replace(sep_new, sep_system)
+        filename = f_obj.fpath.split(sep_system)[-1]
 
         # obtiene el path separado
         f_obj.fpath = f_obj.fpath[:len(f_obj.fpath) - len(filename)]
