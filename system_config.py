@@ -13,8 +13,8 @@ class SystemConfig:
         self.SEP_SYSTEM = self.get_sep_system(self.OP_SYS)
         self.SEP_ENCODED = '<<<separator>>>'
         self.ROOT_DIR = '<<<root_dir>>>'
-        self.receive_path = 'receive/'
-        self.send_path = 'send/'
+        self.receive_path = 'receive'
+        self.send_path = 'send'
 
         # Custom configuration
         self.load_custom_configuration()

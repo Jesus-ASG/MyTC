@@ -37,14 +37,13 @@ def server_mode(ip, port):
     main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     main_socket.bind((ip, port))
     main_socket.listen()
-    print('Server listen...')
     conn, addr = main_socket.accept()
-    print(addr)
 
     if addr[0] == config.IP:  # check client ip
         main_socket.close()  # if it's the same, switch to client mode
         client_mode(ip, port)
         return
+    print(f'Server listen from {addr}')
 
     # # # continue receiving files normally # # #
     data = b''
@@ -83,9 +82,41 @@ def server_mode(ip, port):
 
 
 def client_mode(ip, port):
-    main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    main_socket.connect((ip, port))
+    path_files = list_dir(config.send_path)
+    list_files = []
 
+    # # # Code for client # # #
+    main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ret = main_socket.connect_ex((ip, port))
+    if ret != 0:
+        print('Failed to connect')
+        return
+    print('Connected to server')
+    st = time.time()
+    for fs in path_files:
+        # Reads in binary
+        file = open(fs, 'rb')
+        bin_data = file.read()
+        file.close()
+
+        # Modify path for read by server socket
+        fm = fs
+        fm = fm[len(config.send_path) - 1:len(fm)]
+        fm = '<<<root_dir>>>' + fm
+        fm = fm.replace(config.SEP_ENCODED, config.SEP_SYSTEM)
+
+        # Save into list
+        obj = Structure(fm, bin_data)
+        list_files.append(obj)
+
+        print(f'{fs} sent')  # muestra el archivo enviado
+
+    send = pickle.dumps(list_files)  # convierte lista de objetos a binario
+    main_socket.send(send)  # manda lista de objetos
+    # # # #
+    en = time.time()
+    ej = en - st
+    print(f'files sent in {ej} s')
 
 
 def connect_function(ip, port):
