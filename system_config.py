@@ -48,8 +48,13 @@ class SystemConfig:
         config.read(config_file)
 
         self.PORT = int(config['GENERAL']['PORT'])
-        self.receive_path = config['GENERAL']['receive_path']
-        self.send_path = config['GENERAL']['send_path']
 
+        self.receive_path = config['GENERAL']['receive_path']
+        if self.receive_path.endswith(self.SEP_SYSTEM):
+            self.receive_path = self.receive_path[:len(self.receive_path)-1]
+
+        self.send_path = config['GENERAL']['send_path']
+        if self.send_path.endswith(self.SEP_SYSTEM):
+            self.send_path = self.send_path[:len(self.send_path)-1]
 
 

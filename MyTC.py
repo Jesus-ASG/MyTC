@@ -13,9 +13,9 @@ from structure import Structure  # for load structure with pickle, NO REMOVE
 
 # system variables
 config = SystemConfig()
-mode_server = b'<<<server>>>'
-mode_client = b'<<<client>>>'
 end_program = False
+input_ip = None
+input_port = None
 
 
 l = list()
@@ -34,6 +34,7 @@ def list_dir(path):
 
 
 def server_mode(ip, port):
+    global input_ip, input_port
     main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     main_socket.bind((ip, port))
     main_socket.listen()
@@ -41,7 +42,7 @@ def server_mode(ip, port):
 
     if addr[0] == config.IP:  # check client ip
         main_socket.close()  # if it's the same, switch to client mode
-        client_mode(ip, port)
+        client_mode(input_ip.get(), int(input_port.get()))
         return
     print(f'Server listen from {addr}')
 
@@ -75,7 +76,7 @@ def server_mode(ip, port):
         file = open(fobj.fpath + filename, 'wb')
         file.write(fobj.fdata)
         file.close()
-        print(f'Server: {fobj.fpath + filename} saved')
+        print(f'{fobj.fpath + filename} saved')
 
     # # # # # #
     main_socket.close()
@@ -101,9 +102,9 @@ def client_mode(ip, port):
 
         # Modify path for read by server socket
         fm = fs
-        fm = fm[len(config.send_path) - 1:len(fm)]
-        fm = '<<<root_dir>>>' + fm
-        fm = fm.replace(config.SEP_ENCODED, config.SEP_SYSTEM)
+        fm = fm[len(config.send_path):len(fm)]
+        fm = config.ROOT_DIR + fm
+        fm = fm.replace(config.SEP_SYSTEM, config.SEP_ENCODED)
 
         # Save into list
         obj = Structure(fm, bin_data)
@@ -116,7 +117,7 @@ def client_mode(ip, port):
     # # # #
     en = time.time()
     ej = en - st
-    print(f'files sent in {ej} s')
+    print(f'Files sent in {ej}s')
 
 
 def connect_function(ip, port):
@@ -126,7 +127,7 @@ def connect_function(ip, port):
 
 
 def main():
-    global end_program, config
+    global end_program, config, input_ip, input_port
     # get system configuration
 
     lbl_ip = config.IP
