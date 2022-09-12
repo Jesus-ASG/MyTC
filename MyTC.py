@@ -140,7 +140,7 @@ def main():
     s_height = root.winfo_screenheight()
 
     w_width = 700
-    w_height = 600
+    w_height = 400
 
     c_x = s_width // 2 - w_width // 2
     c_y = s_height // 2 - w_height // 2
@@ -148,29 +148,28 @@ def main():
     window_geometry = f'{w_width}x{w_height}+{c_x}+{c_y}'
     # # # #
 
-    root.title('MyTC')
-    lbl_welcome = tk.Label(root, text='Bienvenido a MyTC')
-    lbl_welcome.place(x=5, y=5)
+    root.title('MyTC - My Tunnel Connector v1.0')
+    ttk.Label(root, text='Bienvenido a MyTC').place(x=w_width//2-100, y=50)
 
     if lbl_ip:
-        lbl_ip = 'Your ip direction: ' + lbl_ip + ':' + str(config.PORT)
+        lbl_ip = 'PC information\nIP ADDRESS: ' + lbl_ip + '    PORT:' + str(config.PORT)
     else:
         lbl_ip = 'Couldn\'nt connect to internet :('
-    lbl_ip = tk.Label(root, text=lbl_ip)
-    lbl_ip.place(x=5, y=25)
+    ttk.Label(root, text=lbl_ip).place(x=50, y=100)
 
-    ttk.Label(root, text='Connect to').place(x=5, y=50)
-    ttk.Label(root, text='IP:').place(x=100, y=50)
+    ttk.Label(root, text='Send Directory Name: '+config.send_path+'/').place(x=50, y=150)
+    ttk.Label(root, text='Receive Directory Name: ' + config.receive_path + '/').place(x=50, y=170)
+    ttk.Label(root, text='IP ADDRESS:').place(x=50, y=250)
     input_ip = ttk.Entry()
-    input_ip.place(x=130, y=50)
-    ttk.Label(root, text='PORT:').place(x=310, y=50)
-    input_port = ttk.Entry()
-    input_port.place(x=360, y=50)
+    input_ip.place(x=150, y=250)
+    ttk.Label(root, text='PORT:').place(x=340, y=250)
+    input_port = ttk.Entry(width=10)
+    input_port.place(x=400, y=250)
 
     thr_server = threading.Thread(target=server_mode, args=(config.IP, config.PORT))
     thr_server.start()
 
-    ttk.Button(root, text='Connect', command=lambda: connect_function(config.IP, config.PORT)).place(x=530, y=50)
+    ttk.Button(root, text='Send', command=lambda: connect_function(config.IP, config.PORT)).place(x=500, y=250)
 
     root.geometry(window_geometry)
 
