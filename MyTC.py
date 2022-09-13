@@ -17,6 +17,10 @@ end_program = False
 input_ip = None
 input_port = None
 
+# control variables
+is_server = False;
+is_client = False;
+
 
 l = list()
 
@@ -34,7 +38,8 @@ def list_dir(path):
 
 
 def server_mode(ip, port):
-    global input_ip, input_port
+    global input_ip, input_port, is_server, is_client
+    is_server = True
     main_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     main_socket.bind((ip, port))
     main_socket.listen()
@@ -42,7 +47,9 @@ def server_mode(ip, port):
 
     if addr[0] == config.IP:  # check client ip
         main_socket.close()  # if it's the same, switch to client mode
-        client_mode(input_ip.get(), int(input_port.get()))
+        is_server = False
+        if is_client:
+            client_mode(input_ip.get(), int(input_port.get()))
         return
     print(f'Server listen from {addr}')
 
@@ -79,7 +86,11 @@ def server_mode(ip, port):
         print(f'{fobj.fpath + filename} saved')
 
     # # # # # #
+    # Close socket
     main_socket.close()
+    # Open socket for loop
+    server_mode(ip, port)
+    
 
 
 def client_mode(ip, port):
@@ -120,10 +131,18 @@ def client_mode(ip, port):
     print(f'Files sent in {ej}s')
 
 
-def connect_function(ip, port):
+def connect_function(ip, port, client_bool):
+    global is_client
+    is_client = client_bool
     new_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     new_socket.connect((ip, port))
     new_socket.close()
+
+
+def close(root):
+    root.destroy()
+    connect_function(config.IP, config.PORT, False)
+    pass
 
 
 def main():
@@ -166,12 +185,15 @@ def main():
     input_port = ttk.Entry(width=10)
     input_port.place(x=400, y=250)
 
+    # starting peer in mode server
     thr_server = threading.Thread(target=server_mode, args=(config.IP, config.PORT))
     thr_server.start()
 
-    ttk.Button(root, text='Send', command=lambda: connect_function(config.IP, config.PORT)).place(x=500, y=250)
+    # if clicks 'send' cancel server and join in mode client
+    ttk.Button(root, text='Send', command=lambda: connect_function(config.IP, config.PORT, True)).place(x=500, y=250)
 
     root.geometry(window_geometry)
+    root.protocol('WM_DELETE_WINDOW', lambda: close(root))
 
     root.mainloop()
     # end_program = True
