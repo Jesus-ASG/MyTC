@@ -15,6 +15,8 @@ class SystemConfig:
         self.ROOT_DIR = '<<<root_dir>>>'
         self.receive_path = 'receive'
         self.send_path = 'send'
+        self.last_ip = ''
+        self.last_port = ''
 
         # Custom configuration
         self.load_custom_configuration()
@@ -50,11 +52,20 @@ class SystemConfig:
         self.PORT = int(config['GENERAL']['PORT'])
 
         self.receive_path = config['GENERAL']['receive_path']
-        if self.receive_path.endswith(self.SEP_SYSTEM):
-            self.receive_path = self.receive_path[:len(self.receive_path)-1]
+        self.receive_path = self.format_routes(self.receive_path)
 
         self.send_path = config['GENERAL']['send_path']
-        if self.send_path.endswith(self.SEP_SYSTEM):
-            self.send_path = self.send_path[:len(self.send_path)-1]
+        self.receive_path = self.format_routes(self.receive_path)
+
+        self.last_ip = config['ADDRESS']['last_ip']
+        self.last_port = config['ADDRESS']['last_port']
+    
+    def format_routes(self, route):
+        fixed_route = route
+        if fixed_route.endswith('/') or fixed_route.endswith('\\'):
+            fixed_route = fixed_route[:len(fixed_route) - 1]
+            fixed_route = fixed_route.replace('/', '\\')
+            fixed_route = fixed_route.replace('\\', self.SEP_SYSTEM)
+        return fixed_route
 
 
